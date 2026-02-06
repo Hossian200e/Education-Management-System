@@ -1,143 +1,76 @@
 import React, { useState } from "react";
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import "../../assets/pages/auth/login.css"; // Make sure path is correct
+import uapLogo from "../../assets/images/logo.jpg"; // Replace with your actual logo path
 
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ userId, password, rememberMe });
+    // Call your API here
   };
 
   return (
-    <>
-      <style>{`
-        /* Full page container */
-        .login-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          background: linear-gradient(to right, #4facfe, #00f2fe);
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Login box */
-        .login-box {
-          background: #fff;
-          padding: 40px;
-          border-radius: 10px;
-          width: 350px;
-          box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-          text-align: center;
-        }
-
-        /* Heading */
-        .login-box h2 {
-          margin-bottom: 5px;
-          color: #333;
-        }
-
-        .welcome-text {
-          margin-bottom: 20px;
-          color: #666;
-        }
-
-        /* Input fields */
-        .input-group {
-          margin-bottom: 20px;
-          text-align: left;
-        }
-
-        .input-group label {
-          display: block;
-          margin-bottom: 5px;
-          color: #555;
-        }
-
-        .input-group input {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          font-size: 14px;
-        }
-
-        /* Checkbox and forgot password */
-        .checkbox-group {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-          font-size: 14px;
-        }
-
-        .checkbox-group a {
-          text-decoration: none;
-          color: #4facfe;
-        }
-
-        .checkbox-group a:hover {
-          text-decoration: underline;
-        }
-
-        /* Sign in button */
-        .login-btn {
-          width: 100%;
-          padding: 12px;
-          background: #4facfe;
-          border: none;
-          border-radius: 5px;
-          color: #fff;
-          font-size: 16px;
-          cursor: pointer;
-          transition: background 0.3s ease;
-        }
-
-        .login-btn:hover {
-          background: #00f2fe;
-        }
-
-        /* Footer */
-        .footer-text {
-          margin-top: 20px;
-          font-size: 12px;
-          color: #999;
-        }
-      `}</style>
+    <div className="login-page">
+      <div className="background-shapes">
+        <div className="shape shape1"></div>
+        <div className="shape shape2"></div>
+        <div className="shape shape3"></div>
+      </div>
 
       <div className="login-container">
         <div className="login-box">
-          <h2>Advance School & College</h2>
-          <p className="welcome-text">Welcome Back</p>
-          <p>Sign in to your account to continue</p>
+          {/* Logo */}
+          <img src={uapLogo} alt="University Logo" className="login-logo" />
+
+          <h2 className="login-title">Demo School & College</h2>
+          <p className="welcome-text">Welcome Back! Sign in to continue</p>
 
           <form onSubmit={handleSubmit}>
+            {/* User ID */}
             <div className="input-group">
               <label htmlFor="userId">User ID</label>
-              <input
-                type="text"
-                id="userId"
-                placeholder="Enter your User ID"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                required
-              />
+              <div className="input-with-icon">
+                <FaUser className="icon" />
+                <input
+                  type="text"
+                  id="userId"
+                  placeholder="Enter your User ID"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
+            {/* Password */}
             <div className="input-group">
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="input-with-icon">
+                <FaLock className="icon" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <span
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
+            {/* Checkbox & Forgot */}
             <div className="checkbox-group">
               <label>
                 <input
@@ -147,16 +80,16 @@ const Login = () => {
                 />
                 Remember me
               </label>
-              <a href="#">Forgot password?</a>
+              <a href="#" className="forgot-link">Forgot Your Password ?</a>
             </div>
 
-            <button type="submit" className="login-btn">Sign In</button>
+            <button type="submit" className="login-btn">Login</button>
           </form>
 
-          <p className="footer-text">© 2026 Advance School & College. All rights reserved.</p>
+          <p className="footer-text">© 2026 Advance IT Solutions. All rights reserved.</p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

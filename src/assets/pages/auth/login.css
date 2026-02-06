@@ -1,0 +1,237 @@
+/* ===== Reset & Full Page Setup ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #6a7afc, #9b7bff);
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* ===== Full Login Page Wrapper ===== */
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #6a7afc, #9b7bff);
+}
+
+/* ===== Floating Shapes ===== */
+.background-shapes .shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 12s ease-in-out infinite alternate;
+}
+
+.shape1 {
+  width: 180px;
+  height: 180px;
+  background: #ff6fcf;
+  top: -50px;
+  left: -50px;
+}
+
+.shape2 {
+  width: 250px;
+  height: 250px;
+  background: #7a61ff;
+  bottom: -80px;
+  right: -80px;
+}
+
+.shape3 {
+  width: 150px;
+  height: 150px;
+  background: #ff97ff;
+  top: 40%;
+  left: 65%;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(45deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+/* ===== Login Container ===== */
+.login-container {
+  z-index: 10;
+  width: 100%;
+  max-width: 600px;
+  padding: 30px;
+}
+
+/* ===== Login Box ===== */
+.login-box {
+  background: rgba(245, 244, 244, 0.95);
+  padding: 50px 35px;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Logo ===== */
+.login-logo {
+  width: 100px;
+  margin-bottom: 15px;
+}
+
+/* ===== Title & Welcome ===== */
+.login-title {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d2d2d;
+}
+
+.welcome-text {
+  margin-bottom: 30px;
+  color: #444;
+  font-size: 14px;
+}
+
+/* ===== Input Groups ===== */
+.input-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #555;
+}
+
+/* ===== Input with Icon ===== */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #888;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 10px 40px 10px 36px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-with-icon input:focus {
+  border-color: #7a61ff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(122, 97, 255, 0.4);
+}
+
+/* ===== Password Toggle Icon ===== */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #7a61ff;
+}
+
+/* ===== Checkbox & Forgot ===== */
+.checkbox-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  font-size: 13px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.forgot-link {
+  color: #7a61ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #5b3dbb;
+  text-decoration: underline;
+}
+
+/* ===== Button ===== */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #9b3fff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+
+.login-btn:hover {
+  background: #7a00ff;
+  box-shadow: 0 8px 20px rgba(122, 97, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Footer ===== */
+.footer-text {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .login-box {
+    padding: 35px 25px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
+
+  .welcome-text {
+    font-size: 13px;
+  }
+
+  .background-shapes .shape {
+    display: none;
+  }
+}

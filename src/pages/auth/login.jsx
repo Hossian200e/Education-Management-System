@@ -1,18 +1,38 @@
 import React, { useState } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import "../../assets/pages/auth/login.css"; // Make sure path is correct
-import uapLogo from "../../assets/images/logo.jpg"; // Replace with your actual logo path
+import "../../assets/pages/auth/login.css";
+import uapLogo from "../../assets/images/logo.jpg";
+import { loginUser } from "../../services/authService"; // correct if structure matches
+
 
 const Login = () => {
-  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState(""); // backend expects email
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ userId, password, rememberMe });
-    // Call your API here
+    setLoading(true);
+
+    try {
+      const data = await loginUser(email, password); // call service
+      alert("Login successful!");
+
+      // Save token in localStorage
+      if (data.token) localStorage.setItem("token", data.token);
+
+      console.log("User data:", data);
+
+      // TODO: Redirect to dashboard/home page
+      // Example: window.location.href = "/dashboard";
+    } catch (error) {
+      alert("Login failed: " + error.message);
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,24 +45,22 @@ const Login = () => {
 
       <div className="login-container">
         <div className="login-box">
-          {/* Logo */}
           <img src={uapLogo} alt="University Logo" className="login-logo" />
-
           <h2 className="login-title">Demo School & College</h2>
           <p className="welcome-text">Welcome Back! Sign in to continue</p>
 
           <form onSubmit={handleSubmit}>
-            {/* User ID */}
+            {/* Email */}
             <div className="input-group">
-              <label htmlFor="userId">User ID</label>
+              <label htmlFor="email">Email</label>
               <div className="input-with-icon">
                 <FaUser className="icon" />
                 <input
-                  type="text"
-                  id="userId"
-                  placeholder="Enter your User ID"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
+                  type="email"
+                  id="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -80,13 +98,19 @@ const Login = () => {
                 />
                 Remember me
               </label>
-              <a href="#" className="forgot-link">Forgot Your Password ?</a>
+              <a href="#" className="forgot-link">
+                Forgot Your Password ?
+              </a>
             </div>
 
-            <button type="submit" className="login-btn">Login</button>
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
           </form>
 
-          <p className="footer-text">© 2026 Advance IT Solutions. All rights reserved.</p>
+          <p className="footer-text">
+            © 2026 Advance IT Solutions. All rights reserved.
+          </p>
         </div>
       </div>
     </div>

@@ -18,7 +18,7 @@ const Sidebar = () => {
 
       <style>{`
         .sidebar {
-          width: 250px;
+          width: 260px;
           height: 100vh;
           background: #fff;
           border-right: 1px solid #e5e7eb;

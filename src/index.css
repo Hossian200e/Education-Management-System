@@ -58,3 +58,34 @@ a {
   border-radius: 12px;
   padding: 16px;
 }
+/* ===== THIN SCROLLBAR ===== */
+
+/* Chrome, Edge, Safari */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 10px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Dark mode */
+.dark-mode .thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+/* Firefox */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af transparent;
+}
+
+.dark-mode .thin-scrollbar {
+  scrollbar-color: #4b5563 transparent;
+}

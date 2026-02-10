@@ -111,16 +111,26 @@ const Navbar = () => {
         }
         body.dark-mode { background:#111827; color:#f3f4f6; }
 
-        .navbar { 
-          height:64px; 
-          background: var(--bg-navbar); 
-          border-bottom:1px solid var(--border-color); 
-          display:flex; 
-          justify-content:space-between; 
-          align-items:center; 
-          padding:0 24px; 
-          flex-wrap: wrap;
-        }
+.navbar {
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 260px;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-navbar);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  transition: left 0.3s;
+}
+
+body.sidebar-collapsed .navbar {
+  left: 70px;
+}
+
 
         .navbar-left { display:flex; flex-direction:column; }
         .navbar-left h2 { font-size:18px; font-weight:600; color: ${theme==="dark"?"#f3f4f6":"#111827"}; }

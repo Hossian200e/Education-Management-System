@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SidebarHeader from "./SidebarHeader";
 import SidebarMenu from "./SidebarMenu";
 import SidebarFooter from "./SidebarFooter";
@@ -6,10 +6,14 @@ import SidebarFooter from "./SidebarFooter";
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
 
+  useEffect(() => {
+    document.body.classList.toggle("sidebar-collapsed", collapsed);
+  }, [collapsed]);
+
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-toggle" onClick={() => setCollapsed(!collapsed)}>
-        <i className={`fa ${collapsed ? "fa-angle-right" : "fa-angle-left"}`} />
+        {collapsed ? "›" : "‹"}
       </div>
 
       <SidebarHeader collapsed={collapsed} />
@@ -18,22 +22,26 @@ const Sidebar = () => {
 
       <style>{`
         .sidebar {
-          width: 260px;
+          position: fixed;
+          top: 0;
+          left: 0;
           height: 100vh;
-          border-right: 1px solid #e5e7eb;
+          width: 260px;
+          background: var(--sidebar-bg);
+          border-right: 1px solid var(--border);
           display: flex;
           flex-direction: column;
-          transition: width 0.3s ease;
-          position: relative;
-          font-family: "Poppins", sans-serif;
+          z-index: 1001;
+          transition: width 0.3s;
         }
+
         .sidebar.collapsed {
           width: 70px;
         }
 
         .sidebar-toggle {
           position: absolute;
-          top: 15px;
+          top: 16px;
           right: -12px;
           width: 28px;
           height: 28px;
@@ -44,6 +52,7 @@ const Sidebar = () => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
+          font-size: 18px;
           z-index: 10;
         }
 

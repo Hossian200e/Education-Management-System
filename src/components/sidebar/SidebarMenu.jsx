@@ -9,7 +9,27 @@ const SidebarMenu = ({ collapsed }) => {
 // Single-level top-level menus (no submenus) with uniform icon spacing
 const menuItems = [
   { title: "Dashboard",             icon: "fa fa-home",                path: "/Dashboard",            key: "dashboard",            iconGap: 12 },
-  { title: "User Management",       icon: "fa fa-users",               path: "/UserManagement",      key: "userMgmt",             iconGap: 12 },
+  
+  {
+  title: "User Management",
+  icon: "fa fa-users",
+  key: "userMgmt",
+  iconGap: 12,
+  subMenu: [
+{
+  title: "User Group List",
+  path: "/user-management/user-group-list",
+  key: "userGroupList"
+}
+,
+    {
+      title: "User Group Role",    
+      path: "/UserGroupRoleManagement",
+      key: "userGroupRoleMgmt"
+    }
+  ]
+},
+
   { title: "System Management",     icon: "fa fa-cogs",                path: "/SystemManagement",    key: "systemMgmt",           iconGap: 12 },
   { title: "Institute Setup",       icon: "fa fa-building",            path: "/InstituteSetup",      key: "instituteSetup",       iconGap: 12 },
   { title: "Accounts",              icon: "fa fa-credit-card",         path: "/Accounts",            key: "accounts",             iconGap: 12 },

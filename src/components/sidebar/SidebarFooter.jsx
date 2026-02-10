@@ -3,7 +3,7 @@ import React from "react";
 const SidebarFooter = ({ collapsed }) => {
   return (
     <div className="sidebar-footer">
-      {!collapsed && <>Powered By <b>ABC IT</b> ©2025</>}
+      {!collapsed && <>Powered By <b>Onu</b> ©2025</>}
 
       <style>{`
         .sidebar-footer {

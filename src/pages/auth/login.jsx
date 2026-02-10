@@ -147,7 +147,7 @@ const Login = () => {
           </form>
 
           <p className="footer-text">
-            © 2026 Advance IT Solutions. All rights reserved.
+            © 2025 Advance IT Solutions. All rights reserved.
           </p>
         </div>
       </div>

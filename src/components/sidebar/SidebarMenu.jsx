@@ -133,15 +133,38 @@ const menuItems = [
       ))}
 
       <style>{`
-        .sidebar-menu { flex:1; height:100vh; overflow-y:auto; background:#fff; padding:20px 10px; color:#1f2937; font-family: 'Inter', sans-serif; transition: width 0.3s ease; }
-        .sidebar-menu.collapsed { width: 60px; padding: 20px 5px; }
-        .menu-title { font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 15px; text-transform: uppercase; padding-left: 12px; }
-        .sidebar-menu::-webkit-scrollbar { width: 6px; }
-        .sidebar-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .sidebar-menu::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        @media (max-width: 768px) { 
-          .sidebar-menu { position: fixed; z-index: 50; left: -240px; width: 240px; transition: left 0.3s; } 
-          .sidebar-menu.open { left: 0; } 
+        .sidebar-menu {
+          flex: 1;
+          padding: 20px 10px;
+          background: var(--sidebar-bg);
+          color: var(--text);
+          overflow-y: auto;
+        }
+
+        .menu-title {
+          font-size: 12px;
+          color: #6b7280;
+          margin-bottom: 15px;
+          padding-left: 12px;
+        }
+
+        :root {
+          --sidebar-bg: #ffffff;
+          --text: #1f2937;
+        }
+
+        body.dark-mode {
+          --sidebar-bg: #1f2937;
+          --text: #e5e7eb;
+        }
+
+        .sidebar-menu::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+          background: #6b7280;
+          border-radius: 4px;
         }
       `}</style>
     </nav>

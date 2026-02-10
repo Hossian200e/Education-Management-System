@@ -19,7 +19,6 @@ const SidebarItem = ({ item, collapsed, level, openKeys, setOpenKeys, dot }) => 
 
   const isActive = path => location.pathname === path;
 
-  // Dynamic icon-text gap: only for top-level single-level menus
   const gap = !hasSubmenu && level === 1 ? item.iconGap ?? 12 : 8;
 
   return (
@@ -32,11 +31,10 @@ const SidebarItem = ({ item, collapsed, level, openKeys, setOpenKeys, dot }) => 
               {!collapsed && <span>{dot} {item.title}</span>}
             </div>
             {!collapsed && (
-              <i
-                className={`fa fa-chevron-right arrow ${isOpen ? "rotated" : ""}`}
-              />
+              <i className={`fa fa-chevron-right arrow ${isOpen ? "rotated" : ""}`} />
             )}
           </div>
+
           <div className={`submenu ${isOpen ? "open" : ""}`}>
             {item.subMenu.map(sub => (
               <SidebarItem
@@ -64,43 +62,41 @@ const SidebarItem = ({ item, collapsed, level, openKeys, setOpenKeys, dot }) => 
         .menu-item {
           display: flex;
           flex-direction: column;
-          font-family: 'Inter', sans-serif;
         }
 
         .menu-label, a {
           display: flex;
           align-items: center;
-          justify-content: flex-start;
           padding: ${10 + (level - 1) * 4}px 16px;
           margin-bottom: 6px;
           border-radius: 8px;
-          cursor: pointer;
           text-decoration: none;
-          color: #1f2937;
+          cursor: pointer;
           font-size: ${14 - (level - 1)}px;
-          font-weight: 500;
-          transition: all 0.3s ease;
-          user-select: none;
+          transition: all 0.25s ease;
+          color: var(--text);
         }
 
         .menu-label:hover, a:hover {
-          background-color: #f3f4f6;
-          color: #2563eb;
+          background: var(--hover);
+          color: var(--accent);
         }
 
-        /* Top-level single-level menu icon-text spacing */
-        .menu-item.level-1:not(.has-submenu) > .menu-label .label-left,
         .menu-item.level-1:not(.has-submenu) > a .label-left {
           gap: ${gap}px;
         }
 
-        .submenu {
+        .label-left {
           display: flex;
-          flex-direction: column;
-          padding-left: ${level * 20}px;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .submenu {
           max-height: 0;
           overflow: hidden;
-          transition: max-height 0.35s ease, padding 0.35s ease;
+          padding-left: ${level * 20}px;
+          transition: max-height 0.35s ease;
         }
 
         .submenu.open {
@@ -108,40 +104,33 @@ const SidebarItem = ({ item, collapsed, level, openKeys, setOpenKeys, dot }) => 
         }
 
         .arrow {
+          margin-left: auto;
           font-size: 12px;
-          color: #6b7280;
-          margin-left: auto; /* always push arrow to far right */
-          transition: transform 0.3s ease, color 0.3s ease;
+          transition: transform 0.3s;
         }
 
         .arrow.rotated {
           transform: rotate(90deg);
         }
 
-        .label-left {
-          display: flex;
-          align-items: center;
-        }
-
-        .sidebar-menu.collapsed .menu-label span,
-        .sidebar-menu.collapsed a span {
-          display: none;
-        }
-
-        .sidebar-menu.collapsed .menu-label,
-        .sidebar-menu.collapsed a {
-          justify-content: center;
-          padding: 10px 0;
-        }
-
         .active {
-          background-color: #e0f2fe;
-          color: #0284c7;
+          background: var(--active-bg);
+          color: var(--accent);
         }
 
-        /* Smooth transition for nested menus */
-        .submenu .menu-item .submenu {
-          padding-left: ${level * 20}px;
+        /* ---------- THEME VARIABLES ---------- */
+        :root {
+          --text: #1f2937;
+          --hover: #f3f4f6;
+          --accent: #2563eb;
+          --active-bg: #e0f2fe;
+        }
+
+        body.dark-mode {
+          --text: #e5e7eb;
+          --hover: #374151;
+          --accent: #60a5fa;
+          --active-bg: #1e3a8a;
         }
       `}</style>
     </div>

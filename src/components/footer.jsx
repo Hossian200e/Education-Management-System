@@ -19,7 +19,7 @@ const Footer = () => {
         }
       `}</style>
       <footer className="footer">
-        © 2024 Advance IT Solutions. All rights reserved.
+        © 2025 Advance IT Solutions. All rights reserved.
       </footer>
     </>
   );

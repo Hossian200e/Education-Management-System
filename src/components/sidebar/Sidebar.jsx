@@ -20,7 +20,6 @@ const Sidebar = () => {
         .sidebar {
           width: 260px;
           height: 100vh;
-          background: #fff;
           border-right: 1px solid #e5e7eb;
           display: flex;
           flex-direction: column;
@@ -28,14 +27,17 @@ const Sidebar = () => {
           position: relative;
           font-family: "Poppins", sans-serif;
         }
-        .sidebar.collapsed { width: 70px; }
+        .sidebar.collapsed {
+          width: 70px;
+        }
+
         .sidebar-toggle {
           position: absolute;
           top: 15px;
           right: -12px;
           width: 28px;
           height: 28px;
-          background: #1d4ed8;
+          background: #2563eb;
           color: #fff;
           border-radius: 50%;
           display: flex;
@@ -43,10 +45,17 @@ const Sidebar = () => {
           justify-content: center;
           cursor: pointer;
           z-index: 10;
-          transition: transform 0.3s;
         }
-        .sidebar.collapsed .sidebar-toggle { transform: rotate(180deg); }
-        body.dark-mode .sidebar { background: #1f2937; border-color: #374151; color: #fff; }
+
+        :root {
+          --sidebar-bg: #ffffff;
+          --border: #e5e7eb;
+        }
+
+        body.dark-mode {
+          --sidebar-bg: #111827;
+          --border: #374151;
+        }
       `}</style>
     </aside>
   );

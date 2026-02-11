@@ -4,8 +4,10 @@ import {
   FaUser, FaSignOutAlt, FaCog, FaQuestionCircle 
 } from "react-icons/fa";
 import { fetchNotifications, fetchMessages } from "../services/navbarService";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [time, setTime] = useState("");
   const [greeting, setGreeting] = useState("");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -20,7 +22,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
 
-  // Update time every second
+  // --- Update Time & Greeting ---
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -46,7 +48,7 @@ const Navbar = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch notifications/messages
+  // --- Fetch Notifications & Messages ---
   useEffect(() => {
     const fetchData = async () => {
       const notifs = await fetchNotifications();
@@ -59,49 +61,59 @@ const Navbar = () => {
     return () => clearInterval(polling);
   }, []);
 
-  // Click outside dropdown handler
+  // --- Handle Click Outside for Dropdowns ---
   useEffect(() => {
     document.body.classList.toggle("dark-mode", theme === "dark");
+
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
       if (notifyRef.current && !notifyRef.current.contains(e.target)) setNotifyOpen(false);
       if (messageRef.current && !messageRef.current.contains(e.target)) setMessagesOpen(false);
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [theme]);
 
+  // --- Theme Toggle ---
   const toggleTheme = () => {
     const t = theme === "dark" ? "light" : "dark";
     setTheme(t);
     localStorage.setItem("theme", t);
+    document.body.classList.toggle("dark-mode", t === "dark");
   };
 
+  // --- Logout ---
   const logout = () => {
     localStorage.clear();
-    window.location.href = "/";
+    navigate("/login");
   };
 
+  // --- Helper Counts ---
   const unreadNotifications = notifications.filter(n => n.unread).length;
   const unreadMessages = messages.filter(m => m.unread).length;
 
-  const markAllRead = (type) => {
+  const markAllRead = (type, e) => {
+    e.stopPropagation();
     if (type === "notifications") setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
     if (type === "messages") setMessages(prev => prev.map(m => ({ ...m, unread: false })));
   };
 
-  const markRead = (type, id) => {
+  const markRead = (type, id, e) => {
+    e.stopPropagation();
     if (type === "notifications") setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
     if (type === "messages") setMessages(prev => prev.map(m => m.id === id ? { ...m, unread: false } : m));
   };
 
-  const deleteItem = (type, id) => {
+  const deleteItem = (type, id, e) => {
+    e.stopPropagation();
     if (type === "notifications") setNotifications(prev => prev.filter(n => n.id !== id));
     if (type === "messages") setMessages(prev => prev.filter(m => m.id !== id));
   };
 
   return (
     <>
+      {/* --- Dynamic Styles --- */}
       <style>{`
         :root {
           --bg-navbar: ${theme === "dark" ? "#1f2937" : "#ffffff"};
@@ -111,26 +123,25 @@ const Navbar = () => {
         }
         body.dark-mode { background:#111827; color:#f3f4f6; }
 
-.navbar {
-  height: 64px;
-  position: fixed;
-  top: 0;
-  left: 260px;
-  right: 0;
-  z-index: 1000;
-  background: var(--bg-navbar);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
-  transition: left 0.3s;
-}
+        .navbar {
+          height: 64px;
+          position: fixed;
+          top: 0;
+          left: 260px;
+          right: 0;
+          z-index: 1000;
+          background: var(--bg-navbar);
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 24px;
+          transition: left 0.3s;
+        }
 
-body.sidebar-collapsed .navbar {
-  left: 70px;
-}
-
+        body.sidebar-collapsed .navbar {
+          left: 70px;
+        }
 
         .navbar-left { display:flex; flex-direction:column; }
         .navbar-left h2 { font-size:18px; font-weight:600; color: ${theme==="dark"?"#f3f4f6":"#111827"}; }
@@ -145,15 +156,12 @@ body.sidebar-collapsed .navbar {
 
         .badge { position:absolute; top:-6px; right:-8px; background:#ef4444; color:#fff; font-size:9px; padding:2px 5px; border-radius:10px; }
 
-        /* Dropdowns */
         .dropdown { 
           position:absolute; top:45px; right:0; width:280px; background: var(--bg-surface); 
           border:1px solid var(--border-color); border-radius:12px; 
           box-shadow:0 10px 30px rgba(0,0,0,.25); overflow:hidden; z-index:10; 
-          opacity:0; transform:translateY(-10px); 
           transition: all 0.3s ease;
         }
-        .dropdown.open { opacity:1; transform:translateY(0); }
 
         .dropdown h4 { padding:10px 12px; font-size:13px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; }
         .dropdown h4 button { background:none; border:none; cursor:pointer; font-size:11px; color:#3b82f6; }
@@ -199,84 +207,98 @@ body.sidebar-collapsed .navbar {
           <div className="time-badge">{time}</div>
 
           {/* Notifications */}
-          <div
-            className={`icon-btn ${unreadNotifications > 0 ? "shake" : ""}`}
-            ref={notifyRef}
-            onClick={() => setNotifyOpen(!notifyOpen)}
-          >
-            <FaBell />
-            {unreadNotifications > 0 && <span className="badge">{unreadNotifications}</span>}
-            <div className={`dropdown ${notifyOpen ? "open" : ""}`}>
-              <h4>
-                Notifications
-                {unreadNotifications > 0 && <button onClick={() => markAllRead("notifications")}>Mark all read</button>}
-              </h4>
-              <div className="dropdown-list">
-                {notifications.length === 0 && <div style={{ padding:"10px", fontSize:"12px", color:"var(--text-secondary)" }}>No notifications</div>}
-                {notifications.map(n => (
-                  <div key={n.id} className={`dropdown-item ${n.unread ? "unread" : ""}`}>
-                    <span onClick={() => markRead("notifications", n.id)}>{n.text}</span>
-                    <button onClick={() => deleteItem("notifications", n.id)}><FaTimes /></button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <Dropdown 
+            icon={<FaBell />} 
+            items={notifications} 
+            unreadCount={unreadNotifications} 
+            open={notifyOpen} 
+            setOpen={setNotifyOpen} 
+            refEl={notifyRef} 
+            type="notifications"
+            markAllRead={markAllRead}
+            markRead={markRead}
+            deleteItem={deleteItem}
+          />
 
           {/* Messages */}
-          <div
-            className={`icon-btn ${unreadMessages > 0 ? "shake" : ""}`}
-            ref={messageRef}
-            onClick={() => setMessagesOpen(!messagesOpen)}
-          >
-            <FaEnvelope />
-            {unreadMessages > 0 && <span className="badge">{unreadMessages}</span>}
-            <div className={`dropdown ${messagesOpen ? "open" : ""}`}>
-              <h4>
-                Messages
-                {unreadMessages > 0 && <button onClick={() => markAllRead("messages")}>Mark all read</button>}
-              </h4>
-              <div className="dropdown-list">
-                {messages.length === 0 && <div style={{ padding:"10px", fontSize:"12px", color:"var(--text-secondary)" }}>No messages</div>}
-                {messages.map(m => (
-                  <div key={m.id} className={`dropdown-item ${m.unread ? "unread" : ""}`}>
-                    <span onClick={() => markRead("messages", m.id)}>{m.text}</span>
-                    <button onClick={() => deleteItem("messages", m.id)}><FaTimes /></button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <Dropdown 
+            icon={<FaEnvelope />} 
+            items={messages} 
+            unreadCount={unreadMessages} 
+            open={messagesOpen} 
+            setOpen={setMessagesOpen} 
+            refEl={messageRef} 
+            type="messages"
+            markAllRead={markAllRead}
+            markRead={markRead}
+            deleteItem={deleteItem}
+          />
 
           {/* Theme */}
-          <div className="icon-btn" onClick={toggleTheme}>
+          <div className="icon-btn" onClick={(e)=>{ e.stopPropagation(); toggleTheme(); }}>
             {theme === "dark" ? <FaSun /> : <FaMoon />}
           </div>
 
           {/* Profile */}
-          <div className="icon-btn" ref={profileRef}>
-            <div className="profile-btn" onClick={() => setProfileOpen(!profileOpen)}>
-              <div className="avatar">S</div>
-              <div>
-                <div style={{ fontSize:"13px" }}>Super Admin</div>
-                <div style={{ fontSize:"11px", color:"var(--text-secondary)" }}>super admin</div>
-              </div>
-            </div>
-
-            <div className={`dropdown profile-menu ${profileOpen ? "open" : ""}`}>
-              <button onClick={() => { setProfileOpen(false); navigate("/profile"); }}>
-  <FaUser /> Profile
-</button>
-
-              <button><FaCog /> Settings</button>
-              <button><FaQuestionCircle /> Help</button>
-              <button className="logout-btn" onClick={logout}><FaSignOutAlt /> Logout</button>
-            </div>
-          </div>
+          <ProfileMenu 
+            open={profileOpen} 
+            setOpen={setProfileOpen} 
+            refEl={profileRef} 
+            logout={logout} 
+            navigate={navigate} 
+            theme={theme}
+          />
         </div>
       </div>
     </>
   );
 };
+
+// --- Dropdown Component ---
+const Dropdown = ({ icon, items, unreadCount, open, setOpen, refEl, type, markAllRead, markRead, deleteItem }) => (
+  <div className={`icon-btn ${unreadCount>0?"shake":""}`} ref={refEl} onClick={(e)=>{ e.stopPropagation(); setOpen(!open); }}>
+    {icon}
+    {unreadCount>0 && <span className="badge">{unreadCount}</span>}
+    {open && (
+      <div className="dropdown" onClick={(e)=>e.stopPropagation()}>
+        <h4>
+          {type.charAt(0).toUpperCase() + type.slice(1)}
+          {unreadCount>0 && <button onClick={(e)=>markAllRead(type,e)}>Mark all read</button>}
+        </h4>
+        <div className="dropdown-list">
+          {items.length===0 && <div style={{ padding:"10px", fontSize:"12px", color:"var(--text-secondary)" }}>No {type}</div>}
+          {items.map(item=>(
+            <div key={item.id} className={`dropdown-item ${item.unread?"unread":""}`}>
+              <span onClick={(e)=>markRead(type,item.id,e)}>{item.text}</span>
+              <button onClick={(e)=>deleteItem(type,item.id,e)}><FaTimes /></button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+// --- Profile Menu Component ---
+const ProfileMenu = ({ open, setOpen, refEl, logout, navigate, theme }) => (
+  <div className="icon-btn" ref={refEl}>
+    <div className="profile-btn" onClick={(e)=>{ e.stopPropagation(); setOpen(!open); }}>
+      <div className="avatar">S</div>
+      <div>
+        <div style={{ fontSize:"13px" }}>Super Admin</div>
+        <div style={{ fontSize:"11px", color:"var(--text-secondary)" }}>super admin</div>
+      </div>
+    </div>
+
+    {open && (
+      <div className="dropdown profile-menu" onClick={(e)=>e.stopPropagation()}>
+        <button onClick={(e)=>{ e.stopPropagation(); setOpen(false); navigate("/profile"); }}><FaUser /> Profile</button>
+        <button><FaCog /> Settings</button>
+        <button><FaQuestionCircle /> Help</button>
+        <button className="logout-btn" onClick={logout}><FaSignOutAlt /> Logout</button>
+      </div>
+    )}
+  </div>
+);
 
 export default Navbar;

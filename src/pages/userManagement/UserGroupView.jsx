@@ -2,24 +2,48 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaHome, FaChevronRight } from "react-icons/fa";
 import Layout from "../../components/layout";
+import { getUserGroupById } from "../../services/userManagement/userGroupListService";
 
 const UserGroupView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = localStorage.getItem("theme") || "light";
-  const [group, setGroup] = useState(null);
 
+  const [group, setGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // 🔹 Fetch from API
   useEffect(() => {
-    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    const foundGroup = storedGroups.find((g) => g.id === parseInt(id));
-    setGroup(foundGroup);
+    const fetchGroup = async () => {
+      try {
+        setLoading(true);
+        const data = await getUserGroupById(id);
+        setGroup(data);
+      } catch (err) {
+        setError("Failed to load User Group.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroup();
   }, [id]);
 
-  if (!group)
+  if (loading)
     return (
       <Layout>
         <p style={{ textAlign: "center", marginTop: "50px" }}>
-          User Group not found
+          Loading User Group...
+        </p>
+      </Layout>
+    );
+
+  if (error || !group)
+    return (
+      <Layout>
+        <p style={{ textAlign: "center", marginTop: "50px", color: "red" }}>
+          {error || "User Group not found"}
         </p>
       </Layout>
     );
@@ -29,7 +53,10 @@ const UserGroupView = () => {
       {/* ===== Breadcrumb ===== */}
       <div style={breadcrumbContainer(theme)}>
         <FaHome />
-        <span onClick={() => navigate("/dashboard")} style={breadcrumbLink(theme)}>
+        <span
+          onClick={() => navigate("/dashboard")}
+          style={breadcrumbLink(theme)}
+        >
           Dashboard
         </span>
         <FaChevronRight />
@@ -51,8 +78,9 @@ const UserGroupView = () => {
           <InfoRow label="Title (En)" value={group.titleEn || "-"} />
           <InfoRow label="Title" value={group.name || "-"} />
           <InfoRow label="Group Code" value={group.code || "-"} />
-          <InfoRow label="Ordering" value={group.ordering || "-"} />
+          <InfoRow label="Ordering" value={group.ordering ?? "-"} />
           <InfoRow label="Created By" value={group.createdBy || "Admin"} />
+
           <InfoRow
             label="Status"
             value={
@@ -66,10 +94,16 @@ const UserGroupView = () => {
               </span>
             }
           />
+
           <InfoRow
             label="Created Date"
-            value={new Date(group.id).toLocaleString()}
+            value={
+              group.createdAt
+                ? new Date(group.createdAt).toLocaleString()
+                : "-"
+            }
           />
+
           <InfoRow
             label="Last Updated"
             value={
@@ -78,6 +112,7 @@ const UserGroupView = () => {
                 : "Not Updated"
             }
           />
+
           <InfoRow
             label="Notes"
             value={group.notes || "No additional notes"}

@@ -1,77 +1,86 @@
-// src/services/userManagement/userGroupListService.js
+import axios from "axios";
 
-/**
- * Service for managing User Groups
- * Currently uses localStorage as a mock database
- */
+/* ===============================
+   AXIOS INSTANCE
+================================= */
 
-const STORAGE_KEY = "groups";
+const API = axios.create({
+  baseURL: "http://localhost:5000/api", // 🔁 Change if your backend port is different
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-/**
- * Get all user groups
- * @returns {Array} Array of user group objects
- */
-export const getUserGroups = () => {
+/* ===============================
+   REQUEST INTERCEPTOR (JWT TOKEN)
+================================= */
+
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // JWT token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/* ===============================
+   USER GROUP APIs
+================================= */
+
+/* 🔹 Get All User Groups */
+export const getUserGroups = async () => {
   try {
-    const groups = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    return groups;
+    const response = await API.get("/user-groups");
+    return response.data;
   } catch (error) {
-    console.error("Error fetching user groups:", error);
-    return [];
+    console.error("Get User Groups Error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
   }
 };
 
-/**
- * Get a single user group by ID
- * @param {number|string} id - Group ID
- * @returns {Object|null} Group object or null if not found
- */
-export const getUserGroupById = (id) => {
-  const groups = getUserGroups();
-  return groups.find((group) => group.id === parseInt(id)) || null;
+/* 🔹 Get Single User Group By ID */
+export const getUserGroupById = async (id) => {
+  try {
+    const response = await API.get(`/user-groups/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get User Group By ID Error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
-/**
- * Add a new user group
- * @param {Object} group - Group object { name, code, ordering }
- * @returns {Object} Added group with generated ID
- */
-export const addUserGroup = (group) => {
-  const groups = getUserGroups();
-  const newGroup = {
-    id: groups.length > 0 ? groups[groups.length - 1].id + 1 : 1,
-    ...group,
-  };
-  groups.push(newGroup);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  return newGroup;
+/* 🔹 Create User Group */
+export const createUserGroup = async (data) => {
+  try {
+    const response = await API.post("/user-groups", data);
+    return response.data;
+  } catch (error) {
+    console.error("Create User Group Error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
-/**
- * Update an existing user group
- * @param {number|string} id - Group ID
- * @param {Object} updatedGroup - Updated group data
- * @returns {Object|null} Updated group or null if not found
- */
-export const updateUserGroup = (id, updatedGroup) => {
-  const groups = getUserGroups();
-  const index = groups.findIndex((group) => group.id === parseInt(id));
-  if (index === -1) return null;
-
-  groups[index] = { ...groups[index], ...updatedGroup };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  return groups[index];
+/* 🔹 Update User Group */
+export const updateUserGroup = async (id, data) => {
+  try {
+    const response = await API.put(`/user-groups/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Update User Group Error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
-/**
- * Delete a user group
- * @param {number|string} id - Group ID
- * @returns {boolean} True if deleted, false if not found
- */
-export const deleteUserGroup = (id) => {
-  let groups = getUserGroups();
-  const initialLength = groups.length;
-  groups = groups.filter((group) => group.id !== parseInt(id));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  return groups.length < initialLength;
+/* 🔹 Delete User Group (Optional) */
+export const deleteUserGroup = async (id) => {
+  try {
+    const response = await API.delete(`/user-groups/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete User Group Error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };

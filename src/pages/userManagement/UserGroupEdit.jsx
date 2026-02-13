@@ -3,6 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaHome, FaChevronRight } from "react-icons/fa";
 import Layout from "../../components/layout";
 import { ToastContainer, toast } from "react-toastify";
+import {
+  getUserGroupById,
+  updateUserGroup,
+} from "../../services/userManagement/userGroupListService";
 import "react-toastify/dist/ReactToastify.css";
 
 const UserGroupEdit = () => {
@@ -10,8 +14,9 @@ const UserGroupEdit = () => {
   const navigate = useNavigate();
   const theme = localStorage.getItem("theme") || "light";
 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    id: parseInt(id),
     titleEn: "",
     name: "",
     code: "",
@@ -19,10 +24,28 @@ const UserGroupEdit = () => {
     status: "Active",
   });
 
+  // 🔹 Load data from API
   useEffect(() => {
-    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    const group = storedGroups.find((g) => g.id === parseInt(id));
-    if (group) setFormData(group);
+    const fetchGroup = async () => {
+      try {
+        setLoading(true);
+        const data = await getUserGroupById(id);
+
+        setFormData({
+          titleEn: data.titleEn || "",
+          name: data.name || "",
+          code: data.code || "",
+          ordering: data.ordering || 0,
+          status: data.status ? "Active" : "Inactive",
+        });
+      } catch (error) {
+        toast.error("Failed to load user group.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroup();
   }, [id]);
 
   const handleChange = (e) => {
@@ -33,53 +56,48 @@ const UserGroupEdit = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  // 🔹 Update API Call
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate code (no spaces)
     if (formData.code.includes(" ")) {
       toast.error("Group code cannot contain spaces.", {
-        position: "top-right",
-        autoClose: 3000,
         theme: theme === "dark" ? "dark" : "light",
-        pauseOnHover: true,
-        draggable: true,
       });
       return;
     }
 
-    // Check duplicate code
-    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    const duplicate = storedGroups.find(
-      (g) => g.code.toLowerCase() === formData.code.toLowerCase() && g.id !== formData.id
-    );
+    const payload = {
+      ...formData,
+      ordering: Number(formData.ordering),
+      status: formData.status === "Active",
+    };
 
-    if (duplicate) {
-      toast.error("Group code already exists. Use a unique code.", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: theme === "dark" ? "dark" : "light",
-        pauseOnHover: true,
-        draggable: true,
-      });
-      return;
+    try {
+      setLoading(true);
+
+      const response = await updateUserGroup(id, payload);
+
+      toast.success(
+        response?.message || "User Group updated successfully!",
+        {
+          theme: theme === "dark" ? "dark" : "light",
+        }
+      );
+
+      setTimeout(() => {
+        navigate("/user-management/user-group-list");
+      }, 1500);
+    } catch (error) {
+      toast.error(
+        error?.message || "Failed to update User Group.",
+        {
+          theme: theme === "dark" ? "dark" : "light",
+        }
+      );
+    } finally {
+      setLoading(false);
     }
-
-    const updatedGroups = storedGroups.map((g) =>
-      g.id === formData.id ? formData : g
-    );
-
-    localStorage.setItem("groups", JSON.stringify(updatedGroups));
-
-    toast.success("User Group updated successfully!", {
-      position: "top-right",
-      autoClose: 2000,
-      theme: theme === "dark" ? "dark" : "light",
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    setTimeout(() => navigate("/user-management/user-group-list"), 1500);
   };
 
   return (
@@ -87,16 +105,10 @@ const UserGroupEdit = () => {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
         theme={theme === "dark" ? "dark" : "light"}
         style={{ zIndex: 9999 }}
       />
+
       <Layout>
         {/* ===== Breadcrumb ===== */}
         <div style={breadcrumbContainer(theme)}>
@@ -118,9 +130,11 @@ const UserGroupEdit = () => {
         {/* ===== Center Card ===== */}
         <div style={pageWrapper}>
           <div style={cardStyle(theme)}>
-            <div style={cardHeader(theme)}>Edit User Group</div>
+            <div style={cardHeader(theme)}>
+              {loading ? "Loading..." : "Edit User Group"}
+            </div>
+
             <form onSubmit={handleSubmit} style={formStyle}>
-              {/* Title (En) */}
               <div style={fieldGroup}>
                 <label style={labelStyle(theme)}>
                   Title (En) <span style={{ color: "#ef4444" }}>*</span>
@@ -131,11 +145,9 @@ const UserGroupEdit = () => {
                   onChange={handleChange}
                   required
                   style={inputStyle(theme)}
-                  placeholder="Enter English title"
                 />
               </div>
 
-              {/* Title */}
               <div style={fieldGroup}>
                 <label style={labelStyle(theme)}>
                   Title <span style={{ color: "#ef4444" }}>*</span>
@@ -146,11 +158,9 @@ const UserGroupEdit = () => {
                   onChange={handleChange}
                   required
                   style={inputStyle(theme)}
-                  placeholder="Enter group title"
                 />
               </div>
 
-              {/* Group Code */}
               <div style={fieldGroup}>
                 <label style={labelStyle(theme)}>
                   Group Code <span style={{ color: "#ef4444" }}>*</span>
@@ -161,11 +171,9 @@ const UserGroupEdit = () => {
                   onChange={handleChange}
                   required
                   style={inputStyle(theme)}
-                  placeholder="Enter unique code (no spaces)"
                 />
               </div>
 
-              {/* Ordering */}
               <div style={fieldGroup}>
                 <label style={labelStyle(theme)}>Ordering</label>
                 <input
@@ -174,11 +182,9 @@ const UserGroupEdit = () => {
                   value={formData.ordering}
                   onChange={handleChange}
                   style={inputStyle(theme)}
-                  placeholder="Enter display order"
                 />
               </div>
 
-              {/* Status */}
               <div style={fieldGroup}>
                 <label style={labelStyle(theme)}>Status</label>
                 <select
@@ -192,11 +198,18 @@ const UserGroupEdit = () => {
                 </select>
               </div>
 
-              {/* Buttons */}
               <div style={buttonContainer}>
-                <button type="submit" style={saveButtonStyle}>
-                  Update
+                <button
+                  type="submit"
+                  style={{
+                    ...saveButtonStyle,
+                    opacity: loading ? 0.7 : 1,
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : "Update"}
                 </button>
+
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
@@ -289,7 +302,6 @@ const inputStyle = (theme) => ({
   background: theme === "dark" ? "#334155" : "#ffffff",
   color: theme === "dark" ? "#f1f5f9" : "#111827",
   fontSize: "14px",
-  outline: "none",
 });
 
 const selectStyle = (theme) => ({
@@ -298,7 +310,6 @@ const selectStyle = (theme) => ({
   border: `1px solid ${theme === "dark" ? "#475569" : "#d1d5db"}`,
   background: theme === "dark" ? "#334155" : "#ffffff",
   color: theme === "dark" ? "#f1f5f9" : "#111827",
-  cursor: "pointer",
 });
 
 const buttonContainer = {

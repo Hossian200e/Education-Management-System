@@ -1,34 +1,29 @@
 import React, { useState, useEffect, useContext } from "react";
 import Layout from "../../components/layout";
-import { FaEye, FaEdit, FaChevronRight, FaHome, FaPlus } from "react-icons/fa";
+import { FaChevronRight, FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import { getUserGroups } from "../../services/userManagement/userGroupListService";
+import { getUserGroupRoles } from "../../services/userManagement/userGroupRoleService";
 
-
-const UserGroupList = () => {
+const UserGroupPermissions = () => {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
-  const [groups, setGroups] = useState([]);
+  const [userGroups, setUserGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Load groups from API instead of localStorage
   useEffect(() => {
-    fetchGroups();
+    fetchUserGroups();
   }, []);
 
-  const fetchGroups = async () => {
+  const fetchUserGroups = async () => {
     try {
       setLoading(true);
-      const response = await getUserGroups();
-
-      // If your backend returns { data: [...] }
-      const groupData = response?.data || response || [];
-
-      setGroups(groupData);
+      const response = await getUserGroupRoles();
+      const data = response?.data || response || [];
+      setUserGroups(data);
     } catch (error) {
       console.error("Error fetching user groups:", error);
-      setGroups([]);
+      setUserGroups([]);
     } finally {
       setLoading(false);
     }
@@ -39,81 +34,52 @@ const UserGroupList = () => {
       {/* Breadcrumb */}
       <div style={breadcrumbContainer(theme)}>
         <FaHome />
-        <span
-          style={breadcrumbLink(theme)}
-          onClick={() => navigate("/dashboard")}
-        >
+        <span style={breadcrumbLink(theme)} onClick={() => navigate("/dashboard")}>
           Dashboard
         </span>
         <FaChevronRight style={{ fontSize: "12px" }} />
-        <span style={breadcrumbCurrent(theme)}>User Group List</span>
+        <span style={breadcrumbCurrent(theme)}>User Group Permissions</span>
       </div>
 
       {/* Card */}
       <div style={cardStyle(theme)}>
-        <div style={cardHeader}>
-          <h2 style={headerTitle(theme)}>User Group List</h2>
-          <button
-            style={addButtonStyle}
-            onClick={() => navigate("/user-management/user-group/add")}
-          >
-            <FaPlus /> New User Group
-          </button>
-        </div>
+        <h2 style={headerTitle(theme)}>User Group Permissions</h2>
 
-        {/* Loading */}
         {loading ? (
           <div style={emptyStateStyle(theme)}>
             <p>Loading user groups...</p>
           </div>
-        ) : groups.length > 0 ? (
+        ) : userGroups.length > 0 ? (
           <div style={{ overflowX: "auto" }}>
             <table style={tableStyle}>
               <thead style={theadStyle(theme)}>
                 <tr>
                   <th style={thStyle(theme)}>#</th>
-                  <th style={thStyle(theme)}>Title</th>
-                  <th style={thStyle(theme)}>Group Code</th>
-                  <th style={thStyle(theme)}>Ordering</th>
+                  <th style={thStyle(theme)}>User Group</th>
+                  <th style={thStyle(theme)}>Created By</th>
+                  <th style={thStyle(theme)}>Created Time</th>
+                  <th style={thStyle(theme)}>Updated By</th>
+                  <th style={thStyle(theme)}>Updated Time</th>
                   <th style={thStyle(theme)}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {groups.map((group, index) => (
+                {userGroups.map((group, index) => (
                   <tr key={group.id} style={trStyle(theme, index)}>
                     <td style={tdStyle(theme)}>{index + 1}</td>
-                    <td style={tdStyle(theme)}>{group.name}</td>
-                    <td style={tdStyle(theme)}>{group.code}</td>
-                    <td style={tdStyle(theme)}>{group.ordering}</td>
-                    <td
-                      style={{
-                        ...tdStyle(theme),
-                        display: "flex",
-                        gap: "8px",
-                      }}
-                    >
+                    <td style={tdStyle(theme)}>{group.groupName || group.name}</td>
+                    <td style={tdStyle(theme)}>{group.createdBy || "-"}</td>
+                    <td style={tdStyle(theme)}>{group.createdTime || "-"}</td>
+                    <td style={tdStyle(theme)}>{group.updatedBy || "-"}</td>
+                    <td style={tdStyle(theme)}>{group.updatedTime || "-"}</td>
+                    <td style={{ ...tdStyle(theme), display: "flex", gap: "8px" }}>
                       <button
                         onClick={() =>
-                          navigate(
-                            `/user-management/user-group/view/${group.id}`
-                          )
+                          navigate(`/user-management/user-group-role/set/${group.id}`)
                         }
-                        style={actionButton("#0ea5e9")}
-                        title="View"
+                        style={actionButton("#16a34a")}
                       >
-                        <FaEye />
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/user-management/user-group/edit/${group.id}`
-                          )
-                        }
-                        style={actionButton("#f59e0b")}
-                        title="Edit"
-                      >
-                        <FaEdit />
+                        Set Role
                       </button>
                     </td>
                   </tr>
@@ -124,14 +90,6 @@ const UserGroupList = () => {
         ) : (
           <div style={emptyStateStyle(theme)}>
             <p>No user groups found.</p>
-            <button
-              style={addButtonStyle}
-              onClick={() =>
-                navigate("/user-management/user-group/add")
-              }
-            >
-              <FaPlus /> Create Your First Group
-            </button>
           </div>
         )}
       </div>
@@ -139,7 +97,7 @@ const UserGroupList = () => {
   );
 };
 
-export default UserGroupList;
+export default UserGroupPermissions;
 
 /* ===== Styles ===== */
 const breadcrumbContainer = (theme) => ({
@@ -172,37 +130,17 @@ const cardStyle = (theme) => ({
       : "0 4px 16px rgba(0,0,0,0.06)",
 });
 
-const cardHeader = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "24px",
-  flexWrap: "wrap",
-};
-
 const headerTitle = (theme) => ({
   fontSize: "20px",
   fontWeight: 600,
   color: theme === "dark" ? "#f8fafc" : "#0f172a",
+  marginBottom: "20px",
 });
-
-const addButtonStyle = {
-  background: "linear-gradient(90deg,#16a34a,#22c55e)",
-  color: "#fff",
-  padding: "10px 18px",
-  borderRadius: "8px",
-  border: "none",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  fontWeight: 500,
-};
 
 const tableStyle = {
   width: "100%",
   borderCollapse: "collapse",
-  minWidth: "600px",
+  minWidth: "700px",
 };
 
 const theadStyle = (theme) => ({
@@ -212,17 +150,13 @@ const theadStyle = (theme) => ({
 const thStyle = (theme) => ({
   padding: "12px",
   textAlign: "left",
-  borderBottom: `1px solid ${
-    theme === "dark" ? "#475569" : "#e2e8f0"
-  }`,
+  borderBottom: `1px solid ${theme === "dark" ? "#475569" : "#e2e8f0"}`,
   color: theme === "dark" ? "#e2e8f0" : "#1e293b",
 });
 
 const tdStyle = (theme) => ({
   padding: "12px",
-  borderBottom: `1px solid ${
-    theme === "dark" ? "#334155" : "#e2e8f0"
-  }`,
+  borderBottom: `1px solid ${theme === "dark" ? "#334155" : "#e2e8f0"}`,
   color: theme === "dark" ? "#f1f5f9" : "#1e293b",
 });
 
@@ -240,7 +174,7 @@ const trStyle = (theme, i) => ({
 const actionButton = (color) => ({
   background: color,
   border: "none",
-  padding: "6px 10px",
+  padding: "6px 12px",
   borderRadius: "6px",
   color: "#fff",
   cursor: "pointer",

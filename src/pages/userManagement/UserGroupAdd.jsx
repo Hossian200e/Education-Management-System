@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaHome, FaChevronRight } from "react-icons/fa";
 import { ThemeContext } from "../../context/ThemeContext";
 import { ToastContainer, toast } from "react-toastify";
+import { createUserGroup } from "../../services/userManagement/userGroupListService";
 import "react-toastify/dist/ReactToastify.css";
 
 const UserGroupAdd = () => {
@@ -15,65 +16,59 @@ const UserGroupAdd = () => {
   const [code, setCode] = useState("");
   const [ordering, setOrdering] = useState("");
   const [status, setStatus] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (code.includes(" ")) {
       toast.error("Group code cannot contain spaces.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
         theme: theme === "dark" ? "dark" : "light",
-        pauseOnHover: true,
-        draggable: true,
-        closeOnClick: true,
       });
       return;
     }
 
-    const groups = JSON.parse(localStorage.getItem("groups") || "[]");
-
-    const duplicate = groups.find(
-      (group) => group.code?.toLowerCase() === code.toLowerCase()
-    );
-
-    if (duplicate) {
-      toast.error("Group code already exists. Use a unique code.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        theme: theme === "dark" ? "dark" : "light",
-        pauseOnHover: true,
-        draggable: true,
-        closeOnClick: true,
-      });
-      return;
-    }
-
-    const newGroup = {
-      id: Date.now(),
-      name: title,
+    const payload = {
       titleEn,
+      name: title,
       code,
-      ordering: Number(ordering),
+      ordering: ordering ? Number(ordering) : 0,
       status,
     };
 
-    const updatedGroups = [...groups, newGroup];
-    localStorage.setItem("groups", JSON.stringify(updatedGroups));
+    try {
+      setLoading(true);
 
-    toast.success("User Group added successfully!", {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      theme: theme === "dark" ? "dark" : "light",
-      pauseOnHover: true,
-      draggable: true,
-      closeOnClick: true,
-    });
+      const response = await createUserGroup(payload);
 
-    setTimeout(() => navigate("/user-management/user-group-list"), 1500);
+      toast.success(
+        response?.message || "User Group added successfully!",
+        {
+          theme: theme === "dark" ? "dark" : "light",
+        }
+      );
+
+      // Reset form (optional)
+      setTitleEn("");
+      setTitle("");
+      setCode("");
+      setOrdering("");
+      setStatus(true);
+
+      setTimeout(() => {
+        navigate("/user-management/user-group-list");
+      }, 1500);
+
+    } catch (error) {
+      toast.error(
+        error?.message || "Failed to add User Group.",
+        {
+          theme: theme === "dark" ? "dark" : "light",
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,16 +76,10 @@ const UserGroupAdd = () => {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
         theme={theme === "dark" ? "dark" : "light"}
         style={{ zIndex: 9999 }}
       />
+
       <Layout>
         {/* ===== Breadcrumb ===== */}
         <div style={breadcrumbContainer(theme)}>
@@ -194,8 +183,16 @@ const UserGroupAdd = () => {
                   Back
                 </button>
 
-                <button type="submit" style={submitButton}>
-                  Add User Group
+                <button
+                  type="submit"
+                  style={{
+                    ...submitButton,
+                    opacity: loading ? 0.7 : 1,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? "Adding..." : "Add User Group"}
                 </button>
               </div>
             </form>
@@ -207,7 +204,6 @@ const UserGroupAdd = () => {
 };
 
 export default UserGroupAdd;
-
 /* ================= STYLES ================= */
 
 const breadcrumbContainer = (theme) => ({

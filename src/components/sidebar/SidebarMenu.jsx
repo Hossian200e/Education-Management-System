@@ -24,7 +24,7 @@ const menuItems = [
 ,
     {
       title: "User Group Role",    
-      path: "/UserGroupRoleManagement",
+      path: "/user-management/user-group-role", // Corrected path
       key: "userGroupRoleMgmt"
     }
   ]

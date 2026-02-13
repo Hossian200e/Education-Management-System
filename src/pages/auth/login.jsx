@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,6 +14,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // for redirect
 
+  // Redirect if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -27,7 +35,7 @@ const Login = () => {
 
         // Redirect after short delay
         setTimeout(() => {
-          navigate("/dashboard"); // change to your dashboard route
+          navigate("/dashboard", { replace: true }); // Replace so user can't go back to login
         }, 1500);
       } else {
         toast.error("Invalid credentials!", { position: "top-right" });
@@ -152,7 +160,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer />
     </div>
   );

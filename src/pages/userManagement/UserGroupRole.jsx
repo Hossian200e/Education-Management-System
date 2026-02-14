@@ -14,7 +14,7 @@ const UserGroupPermissions = () => {
   useEffect(() => {
     const fetchUserGroups = async () => {
       setLoading(true);
-      const data = await getAllGroupsWithRoles(); // Fetch from API
+      const data = await getAllGroupsWithRoles();
       setUserGroups(data);
       setLoading(false);
     };
@@ -23,7 +23,6 @@ const UserGroupPermissions = () => {
 
   return (
     <Layout>
-      {/* Breadcrumb */}
       <div style={breadcrumbContainer(theme)}>
         <FaHome />
         <span style={breadcrumbLink(theme)} onClick={() => navigate("/dashboard")}>
@@ -33,7 +32,6 @@ const UserGroupPermissions = () => {
         <span style={breadcrumbCurrent(theme)}>User Group Permissions</span>
       </div>
 
-      {/* Card */}
       <div style={cardStyle(theme)}>
         <h2 style={headerTitle(theme)}>User Group Permissions</h2>
 

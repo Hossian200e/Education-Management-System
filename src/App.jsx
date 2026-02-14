@@ -14,6 +14,7 @@ import UserGroupView from "./pages/userManagement/UserGroupView";
 
 // User Group Role
 import UserGroupRole from "./pages/userManagement/UserGroupRole";
+import UserGroupRoleSet from "./pages/userManagement/UserGroupRoleSet";
 // Theme Context
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -35,6 +36,8 @@ const App = () => {
           <Route path="/user-management/user-group/view/:id" element={<UserGroupView />} />
           {/* User Group Role Routes */}
           <Route path="/user-management/user-group-role" element={<UserGroupRole />} />
+          <Route path="/user-management/user-group-role/set/:id" element={<UserGroupRoleSet />} />
+
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

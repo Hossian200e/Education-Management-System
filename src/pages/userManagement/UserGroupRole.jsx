@@ -3,7 +3,7 @@ import Layout from "../../components/layout";
 import { FaChevronRight, FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import { getUserGroupRoles } from "../../services/userManagement/userGroupRoleService";
+import { getAllGroupsWithRoles } from "../../services/userManagement/userGroupRoleService";
 
 const UserGroupPermissions = () => {
   const navigate = useNavigate();
@@ -12,22 +12,14 @@ const UserGroupPermissions = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchUserGroups = async () => {
+      setLoading(true);
+      const data = await getAllGroupsWithRoles(); // Fetch from API
+      setUserGroups(data);
+      setLoading(false);
+    };
     fetchUserGroups();
   }, []);
-
-  const fetchUserGroups = async () => {
-    try {
-      setLoading(true);
-      const response = await getUserGroupRoles();
-      const data = response?.data || response || [];
-      setUserGroups(data);
-    } catch (error) {
-      console.error("Error fetching user groups:", error);
-      setUserGroups([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Layout>
@@ -65,17 +57,17 @@ const UserGroupPermissions = () => {
               </thead>
               <tbody>
                 {userGroups.map((group, index) => (
-                  <tr key={group.id} style={trStyle(theme, index)}>
+                  <tr key={group.group_id} style={trStyle(theme, index)}>
                     <td style={tdStyle(theme)}>{index + 1}</td>
-                    <td style={tdStyle(theme)}>{group.groupName || group.name}</td>
-                    <td style={tdStyle(theme)}>{group.createdBy || "-"}</td>
-                    <td style={tdStyle(theme)}>{group.createdTime || "-"}</td>
-                    <td style={tdStyle(theme)}>{group.updatedBy || "-"}</td>
-                    <td style={tdStyle(theme)}>{group.updatedTime || "-"}</td>
+                    <td style={tdStyle(theme)}>{group.user_group}</td>
+                    <td style={tdStyle(theme)}>{group.created_by}</td>
+                    <td style={tdStyle(theme)}>{group.created_time}</td>
+                    <td style={tdStyle(theme)}>{group.updated_by}</td>
+                    <td style={tdStyle(theme)}>{group.updated_time}</td>
                     <td style={{ ...tdStyle(theme), display: "flex", gap: "8px" }}>
                       <button
                         onClick={() =>
-                          navigate(`/user-management/user-group-role/set/${group.id}`)
+                          navigate(`/user-management/user-group-role/set/${group.group_id}`)
                         }
                         style={actionButton("#16a34a")}
                       >

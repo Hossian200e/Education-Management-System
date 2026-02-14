@@ -1,79 +1,40 @@
 import axios from "axios";
 
-// Base URL for your backend API
-const API_BASE_URL = "http://localhost:5000/api/user-group-roles"; // Change this to your backend URL
+const API_BASE_URL = "http://localhost:5000/api/user-groups-role";
 
 /**
- * Get all user group roles
- * @returns {Promise} Axios response
+ * Fetch all user groups with roles
  */
-export const getUserGroupRoles = async () => {
+export const getAllGroupsWithRoles = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}`);
-    return response.data; // Assuming API returns { data: [...] }
+    const response = await axios.get(API_BASE_URL);
+    if (response.status === 200) {
+      return response.data.map((group) => ({
+        group_id: group.group_id,
+        user_group: group.user_group,
+        created_by: group.created_by || "system",
+        created_time: group.createdAt,
+        updated_by: group.updated_by || "system",
+        updated_time: group.updatedAt,
+        role_name: group.role || "-", // optional
+      }));
+    }
+    return [];
   } catch (error) {
-    console.error("Error fetching user group roles:", error);
-    throw error;
+    console.error("Error fetching user groups with roles:", error);
+    return [];
   }
 };
 
 /**
- * Get a single user group role by ID
- * @param {number|string} id
- * @returns {Promise} Axios response
+ * Fetch roles by group ID
  */
-export const getUserGroupRoleById = async (id) => {
+export const getGroupRolesById = async (id) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/${id}`);
-    return response.data; // Assuming API returns { data: {...} }
+    return response.status === 200 ? response.data : [];
   } catch (error) {
-    console.error(`Error fetching role with id ${id}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Create a new user group role
- * @param {object} roleData - { name, groupId, description }
- * @returns {Promise} Axios response
- */
-export const createUserGroupRole = async (roleData) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}`, roleData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating role:", error);
-    throw error;
-  }
-};
-
-/**
- * Update an existing user group role
- * @param {number|string} id
- * @param {object} roleData - { name, groupId, description }
- * @returns {Promise} Axios response
- */
-export const updateUserGroupRole = async (id, roleData) => {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/${id}`, roleData);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating role with id ${id}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Delete a user group role
- * @param {number|string} id
- * @returns {Promise} Axios response
- */
-export const deleteUserGroupRole = async (id) => {
-  try {
-    const response = await axios.delete(`${API_BASE_URL}/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting role with id ${id}:`, error);
-    throw error;
+    console.error(`Error fetching user group ${id} roles:`, error);
+    return [];
   }
 };
